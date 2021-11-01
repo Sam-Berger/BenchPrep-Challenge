@@ -6,8 +6,8 @@ class WordFinder
   def find(letters)
 
     file = File.read('./dictionary.json')
-    data_hash = JSON.parse(file)
-    dictionary = data_hash.to_set
+    data = JSON.parse(file)
+    dictionary = data.to_set
     
     resultsArray = Array.new
     
