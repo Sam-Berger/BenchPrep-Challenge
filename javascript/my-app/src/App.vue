@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Quotes msg = "Quote imbed message">
+    <Quotes>
     </Quotes>
     <!-- <Practice msg="fdsdfsdfsd"/> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js AppIII"/> -->

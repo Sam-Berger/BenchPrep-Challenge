@@ -2,26 +2,31 @@
 <template>
   <div class="quotes">
       <div>
-        <h2>Quotes!!!</h2>
+        <h2>Here Are Some Quotes!</h2>
         <button v-on:click="showMovieQuotes()">Show Only Movie Quotes</button>
         <button v-on:click="showGameQuotes()">Show Only Game Quotes</button>
-        <!-- <h1>{{activeQuotesData}}</h1>
-        <h1>{{quotesData}}</h1> -->
-
-
-        <!-- <h1>Page {{page}}</h1> -->
-        <!-- <h1>Per Page {{perPage}}</h1> -->
-        <!-- <h1>quotesLength {{quotesData.length}}</h1>
-        <h1>paginatedquotesLength {{paginatedQuotes.length}}</h1> -->
-        <!-- <h1>paginatedquotesLength {{paginate(quotesData)}}</h1> -->
-        <!-- <h1>paginatedquotesLength {{(paginatedQuotes)}}</h1> -->
+        <br>
+        <input v-model="message" placeholder="Put Search Text Here">
+        <button v-on:click="search()">Search</button>
         <ul>
-            <div v-for="item in paginatedQuotes" v-bind:key="item">
-                <h1>{{item.quote}}</h1>
-                <h2>{{item.source}}</h2>
-                <h3>{{item.context}}</h3>
-                <h4>{{item.theme}}</h4>
-            </div>
+            <table v-for="item in paginatedQuotes" v-bind:key="item">
+                <tr>
+                    <td>
+                        <div>
+                        {{item.quote}}
+                        </div>
+                        <div>
+                        -{{item.source}}
+                        </div>
+                        <div>
+                        {{item.context}}
+                        </div>
+                        <div>
+                        {{item.theme}}
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </ul>
       </div>
       <div class="pagination-nav">
@@ -34,17 +39,15 @@
 <script>
 export default {
   name: 'Quotes',
-  props: {
-    msg: String,
-  },
   data: function () {
     return {
       quotesData: [],
-      activeQuotesData: [123],
-      activeQuotesData2: [],
+      activeQuotesData: [],
+      fullQuotesData: [],
       page: 1,
       perPage: 15,
-      pages: 1
+      pages: 1,
+      message: ""
     }
   },
   methods:{
@@ -52,16 +55,17 @@ export default {
           fetch('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
             .then(response => response.json())
             .then(data => {
-            console.log("data", data);
+            // console.log("data", data);
             this.quotesData = data;
-            console.log("this", this.quotesData)
+            // console.log("this", this.quotesData)
 
-            var postData = [444];
+            var postData = [];
             for(var i=0;i<(this.quotesData).length;i++) {
                 postData.push(Object.assign({}, this.quotesData[i]));
             }
-            console.log("postData", postData)
-            this.activeQuotesData = postData 
+            // console.log("postData", postData)
+            this.fullQuotesData = postData 
+            this.activeQuotesData = this.fullQuotesData
 
             //the issue here is that getData is async, so the fetch takes a while, whereas the loop that was initially below i thought was happening later, it wasnt. so the for loop needs to be async too
             })
@@ -87,19 +91,20 @@ export default {
             // .then(response => response.json())
             // .then(data => this.activeQuotesData2 = data);
       },
-      copyQuotes() {
-        var postData = [444];
+    //   copyQuotes() {
+    //     var postData = [444];
 
-        for(var i=0;i<this.quotesData.length;i++) {
-        postData.push(Object.assign({}, this.quotesData[i]));
-        }
-        this.activeQuotesData = postData    
+    //     for(var i=0;i<this.quotesData.length;i++) {
+    //     postData.push(Object.assign({}, this.quotesData[i]));
+    //     }
+    //     this.activeQuotesData = postData    
         
-      },
+    //   },
       getNumberOfPages() {
-          this.pages = Math.ceil(this.quotesData.length/this.perPage)
+          this.pages = Math.ceil(this.activeQuotesData.length/this.perPage)
       },
       paginate(quotesData) {
+          //this is not working propertly, it still thinks there are three pages after hitting games, among others
           let from = (this.page - 1) * this.perPage
           let to = this.page * this.perPage
           return quotesData.slice(from,to)
@@ -111,10 +116,15 @@ export default {
           this.page--
       },
       showGameQuotes(){
-          return this.quotesData.filter(quote => quote.theme == "games")
+          return this.activeQuotesData = this.fullQuotesData.filter(quote => quote.theme == "games")
       },
       showMovieQuotes(){
-          return this.quotesData = this.quotesData.filter(quote => quote.theme == "movies")
+          return this.activeQuotesData = this.fullQuotesData.filter(quote => quote.theme == "movies")
+      },
+      search(){
+          console.log(this.fullQuotesData)
+          console.log(this.message)
+          return this.activeQuotesData = this.fullQuotesData.filter(item => ((item.quote.toLowerCase())).includes(this.message.toLowerCase()))
       }
 
   },
@@ -134,53 +144,10 @@ export default {
           this.getNumberOfPages()
       }
   },
-  ready: function() {
-    //   this.activeQuotesData = JSON.parse(JSON.stringify(this.quotesData));
-    //below does not transfer [444] without loop
-        // this.copyQuotes()
-
-  },
-
   created() {
     this.getData()
-    //below assigns activequotesdata to [444] when not using loop
-    // this.copyQuotes()
   },
 }
-
-
-//   created() {
-//   // Simple GET request using fetch
-//   fetch('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
-//     .then(response => {
-//             console.log(response);
-
-//             // this.quotesData = response;
-//     }
-//   }
-// }
-
-//   created: {
-//     axios.get('http://http://ideazfactory.in/library/jj.json')
-//       .then(response => {
-//          this.cars = response;
-//       }
-//   }
-
-//   methods: {
-      
-//     // increment() {
-//     //   // `this` will refer to the component instance
-//     //   this.count++
-//     // }
-
-//     created() {
-//         axios.get('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
-//         .then(response => {
-            // this.quotesData = response;
-//         }
-//     }
-//   }
 
 </script>
 
