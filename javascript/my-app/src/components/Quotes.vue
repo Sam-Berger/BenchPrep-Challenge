@@ -5,6 +5,9 @@
         <h2>Quotes!!!</h2>
         <button v-on:click="showMovieQuotes()">Show Only Movie Quotes</button>
         <button v-on:click="showGameQuotes()">Show Only Game Quotes</button>
+        <!-- <h1>{{activeQuotesData}}</h1>
+        <h1>{{quotesData}}</h1> -->
+
 
         <!-- <h1>Page {{page}}</h1> -->
         <!-- <h1>Per Page {{perPage}}</h1> -->
@@ -37,7 +40,8 @@ export default {
   data: function () {
     return {
       quotesData: [],
-      activeQuotesData: [],
+      activeQuotesData: [123],
+      activeQuotesData2: [],
       page: 1,
       perPage: 15,
       pages: 1
@@ -47,7 +51,50 @@ export default {
       getData() {
           fetch('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
             .then(response => response.json())
-            .then(data => this.quotesData = data);
+            .then(data => {
+            console.log("data", data);
+            this.quotesData = data;
+            console.log("this", this.quotesData)
+
+            var postData = [444];
+            for(var i=0;i<(this.quotesData).length;i++) {
+                postData.push(Object.assign({}, this.quotesData[i]));
+            }
+            console.log("postData", postData)
+            this.activeQuotesData = postData 
+
+            //the issue here is that getData is async, so the fetch takes a while, whereas the loop that was initially below i thought was happening later, it wasnt. so the for loop needs to be async too
+            })
+            // this.activeQuotesData=this.quotesData
+
+        // var postData = [444];
+        // console.log("start")        
+        // console.log(this.quotesData)
+        // console.log(this.quotesData.length)
+        // for(var i=0;i<(this.quotesData).length;i++) {
+        //     console.log(this.quotesData[i])
+        // postData.push(Object.assign({}, this.quotesData[i]));
+        // }
+        // console.log(postData)
+        // this.activeQuotesData = postData    
+        
+
+            // fetch('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
+            // .then(response => response.json())
+            // .then(data => this.activeQuotesData = data);
+
+            // fetch('https://gist.githubusercontent.com/benchprep/dffc3bffa9704626aa8832a3b4de5b27/raw/quotes.json')
+            // .then(response => response.json())
+            // .then(data => this.activeQuotesData2 = data);
+      },
+      copyQuotes() {
+        var postData = [444];
+
+        for(var i=0;i<this.quotesData.length;i++) {
+        postData.push(Object.assign({}, this.quotesData[i]));
+        }
+        this.activeQuotesData = postData    
+        
       },
       getNumberOfPages() {
           this.pages = Math.ceil(this.quotesData.length/this.perPage)
@@ -64,7 +111,7 @@ export default {
           this.page--
       },
       showGameQuotes(){
-          return this.quotesData = this.quotesData.filter(quote => quote.theme == "games")
+          return this.quotesData.filter(quote => quote.theme == "games")
       },
       showMovieQuotes(){
           return this.quotesData = this.quotesData.filter(quote => quote.theme == "movies")
@@ -72,19 +119,33 @@ export default {
 
   },
   computed: {
+      //perhaps we should change this to processedQuotes, or something like that, and do the processing for movies/games
+      //but also the search functionality
 	paginatedQuotes: function () {
-		return this.paginate(this.quotesData);
-	}
+        // console.log("paginated ", this.quotesData)
+		return this.paginate(this.activeQuotesData);
+	},
+    copiedStuff: function() {
+        return this.copyQuotes()
+    }
 },
   watch: {
       quotesData() {
           this.getNumberOfPages()
       }
   },
+  ready: function() {
+    //   this.activeQuotesData = JSON.parse(JSON.stringify(this.quotesData));
+    //below does not transfer [444] without loop
+        // this.copyQuotes()
+
+  },
 
   created() {
     this.getData()
-  }
+    //below assigns activequotesdata to [444] when not using loop
+    // this.copyQuotes()
+  },
 }
 
 
