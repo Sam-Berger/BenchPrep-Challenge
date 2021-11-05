@@ -2,6 +2,13 @@
     <div class="quotes">
         <div>
             <h2>Here Are Some Quotes!</h2>
+            <h1>pageniatedquotesarray length {{paginatedQuotesArray.length}}</h1>
+            <!-- <h1>{{paginatedQuotesArray}}</h1> -->
+            <h1>pages {{pages}}</h1>
+            <h1>current page {{page}}</h1>
+
+
+            <button v-on:click="showAllQuotes()">Show All Quotes</button>
             <button v-on:click="showMovieQuotes()">Show Only Movie Quotes</button>
             <button v-on:click="showGameQuotes()">Show Only Game Quotes</button>
             <br>
@@ -35,7 +42,7 @@ export default {
             fullQuotesData: [],
             paginatedQuotesArray: [],
             page: 1,
-            perPage: 15,
+            perPage: 2,
             pages: 1,
             message: "",
             isGameQuotes: false,
@@ -68,7 +75,8 @@ export default {
             let from = (this.page - 1) * this.perPage
             let to = this.page * this.perPage
             //remove below statment if necessary. Trial to update pages
-            this.getNumberOfPages(this.paginatedQuotesArray)
+            // this.getNumberOfPages(this.paginatedQuotesArray)
+            console.log("paginated stuff", quotesData.slice(from,to))
             return quotesData.slice(from,to)
         },
 
@@ -88,6 +96,10 @@ export default {
             return this.isGameQuotes = false, this.isMovieQuotes = true
         },
 
+        showAllQuotes(){
+            return this.isGameQuotes = false, this.isMovieQuotes = false
+        },
+
         search(){
             if (this.message != "") {
                 return this.isSearched = true
@@ -95,8 +107,10 @@ export default {
         }
     },
     computed: {
+        //perhaps this should be filtered quotes and have another function called paginatedQuotes
         paginatedQuotes: function () {
             let paginatedQuotesArray = this.fullQuotesData
+            // console.log(paginatedQuotesArray)
             if (this.isGameQuotes) {
                 paginatedQuotesArray = this.fullQuotesData.filter(quote => quote.theme == "games")
             }
@@ -106,11 +120,23 @@ export default {
             if (this.isSearched) {
                 paginatedQuotesArray = paginatedQuotesArray.filter(item => ((item.quote.toLowerCase())).includes(this.message.toLowerCase()))
             }
-            // this.paginatedQuotesArray = paginatedQuotesArray
-            return this.paginate(paginatedQuotesArray)
+            //this is actually unncessary and  causes an infinite loop
+            //this may be unncessary
+            // this.getNumberOfPages(this.paginatedQuotesArray)
+            
+            console.log("paginated after", paginatedQuotesArray)
+            return paginatedQuotesArray// this.paginatedQuotesArray = paginatedQuotesArray
+            // return this.paginate(paginatedQuotesArray)
         }
     },
     watch: {
+        paginatedQuotes: {
+            deep: true,
+            handler: function (newVal) {
+                this.paginatedQuotesArray = newVal
+                // this.getNumberOfPages(this.paginatedQuotesArray)
+            }
+        },
         quotesData() {
             this.getNumberOfPages(this.paginatedQuotesArray)
         }
