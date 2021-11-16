@@ -112,14 +112,15 @@ export default {
             return Math.ceil(this.filteredQuotes.length/this.perPage)
         }
     },
-    watch: {
-        filteredQuotes: {
-            deep: true,
-            handler: function (newVal) {
-                this.filteredQuotesArray = newVal
-            }
-        },
-    },
+    //I DO NOT NEED THIS WATCH PROPERTY. AT ONE POINT I DID BUT THIS FUNCTIONS PERFECTLY WITHOUT IT.
+    // watch: {
+    //     filteredQuotes: {
+    //         deep: true,
+    //         handler: function (newVal) {
+    //             this.filteredQuotesArray = newVal
+    //         }
+    //     },
+    // },
     created() {
         this.getData()
     },
